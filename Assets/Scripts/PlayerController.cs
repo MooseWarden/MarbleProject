@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     public GameObject cameraObj;
     public float jumpMultiplier = 2f;
     public int maxJumps = 1;
+    public int speedMultiplier;
     public bool paused;
 
     private Rigidbody rb;
@@ -148,6 +149,22 @@ public class PlayerController : MonoBehaviour
             count = count + 1; //count++;
 
             SetCountText();
+        }
+
+        //FIX, UNTANGLE FROM HERE, SAME WITH THE OTHER DEPENDANT OBJECTS, ONLY SHIT RELATING TO PLAYER SPECIFICALLY SHOULD GO HERE
+        if (other.gameObject.CompareTag("SpeedPad"))
+        {
+            float angle = other.transform.eulerAngles.y;
+            float targetAngle = Mathf.Atan2(movementX, movementZ) * Mathf.Rad2Deg + angle;
+            Vector3 moveDir = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
+            //Vector3 go = new Vector3(-1f, 0.0f, 0.0f);
+            
+            Vector3 cancelMoveForce = new Vector3(-rb.velocity.x, 0.0f, -rb.velocity.z);
+            rb.AddForce(cancelMoveForce, ForceMode.Impulse);
+            rb.AddForce(Vector3.zero);
+
+            rb.AddForce(moveDir * speedMultiplier, ForceMode.Impulse);
+            Debug.Log(moveDir * speedMultiplier);
         }
     }
     

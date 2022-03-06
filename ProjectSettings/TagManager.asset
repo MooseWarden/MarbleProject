@@ -6,6 +6,7 @@ TagManager:
   tags:
   - PickUp
   - Ground
+  - SpeedPad
   layers:
   - Default
   - TransparentFX
