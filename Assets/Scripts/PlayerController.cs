@@ -31,14 +31,13 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+
         count = 0;
         numPickUps = GameObject.FindGameObjectsWithTag("PickUp").Length;
         SetCountText();
         winTextObject.SetActive(false);
 
-        //Debug.Log(numPickUps);
         touchingGround = false;
-        //Debug.Log(touchingGround);
         canJump = true;
         jumpCharges = maxJumps;
 
@@ -110,7 +109,7 @@ public class PlayerController : MonoBehaviour
 
     void Jump()
     {
-        if (canJump == true && jumpCharges > 0 && paused == false) //used to use the touchingGround bool
+        if (canJump == true && jumpCharges > 0 && paused == false)
         {
             Vector3 movement = Vector3.zero;
             movement = new Vector3(0.0f, movementY, 0.0f); //x is left to right, y is up and down, z is forwad and back
@@ -118,7 +117,6 @@ public class PlayerController : MonoBehaviour
             rb.AddForce(cancelYForce, ForceMode.Impulse);
             rb.AddForce(movement * jumpMultiplier, ForceMode.Impulse);
             jumpCharges--;
-            //Debug.Log("canJump: " + canJump + "|| jumpCharges: " + jumpCharges + "|| maxjumps " + maxJumps + "|| touching " + touchingGround);
         }
     }
 
@@ -127,8 +125,7 @@ public class PlayerController : MonoBehaviour
         float angle = cameraObj.transform.eulerAngles.y;
         float targetAngle = Mathf.Atan2(movementX, movementZ) * Mathf.Rad2Deg + angle;
         Vector3 moveDir = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
-        //Vector3 movement = new Vector3(movementX, 0.0f, movementZ); //x is left to right, y is up and down, z is forwad and back
-        //rb.AddForce(movement * speed);
+        Debug.Log(rb.velocity);
         if(movementX == 0.0f && movementZ == 0.0f)
         {
             rb.AddForce(Vector3.zero);
@@ -137,7 +134,6 @@ public class PlayerController : MonoBehaviour
         {
             rb.AddForce(moveDir * speed);
         }
-        //Debug.Log(moveDir);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -157,7 +153,6 @@ public class PlayerController : MonoBehaviour
         {
             touchingGround = true;
             jumpCharges = maxJumps;
-            //Debug.Log("touching");
         }
     }
 
@@ -166,7 +161,6 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.CompareTag("Ground") && touchingGround == true)
         {
             touchingGround = false;
-            //Debug.Log("not touching");
         }
     }
 }

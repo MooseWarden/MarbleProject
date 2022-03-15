@@ -42,6 +42,7 @@ public class SpeedBoostCtrl : MonoBehaviour
 
             //apply speed boost
             rb.AddForce(moveDir * speedBoost, ForceMode.Impulse);
+            other.GetComponent<ParticleSystem>().Play();
         }
     }
 }
