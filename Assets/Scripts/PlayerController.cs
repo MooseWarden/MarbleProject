@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     public int maxJumps = 1;
     public bool paused;
     public GameObject GrndDetector;
+    public bool onAngledGrnd;
 
     private Rigidbody rb;
     private int count;
@@ -27,6 +28,7 @@ public class PlayerController : MonoBehaviour
     public bool touchingGround;
     private bool canJump;
     private bool visible;
+    private Vector3 tempNormal;
 
     // Start is called before the first frame update
     void Start()
@@ -46,6 +48,9 @@ public class PlayerController : MonoBehaviour
 
         paused = false;
         visible = false;
+        onAngledGrnd = false;
+
+        tempNormal = Vector3.zero;
     }
 
     //had to change up the input schema from the input actions window to make it a vector3
@@ -113,7 +118,18 @@ public class PlayerController : MonoBehaviour
         if (canJump == true && jumpCharges > 0 && paused == false)
         {
             Vector3 movement = Vector3.zero;
-            movement = new Vector3(0.0f, movementY, 0.0f); //x is left to right, y is up and down, z is forwad and back
+
+            if(onAngledGrnd == false)
+            {
+                movement = new Vector3(0.0f, movementY, 0.0f); //x is left to right, y is up and down, z is forwad and back
+            }
+            else if(onAngledGrnd == true)
+            {
+                movement = tempNormal;
+                onAngledGrnd = false;
+                Vector3 cancelXZForce = new Vector3(-rb.velocity.x, 0.0f, -rb.velocity.z);
+                rb.AddForce(cancelXZForce, ForceMode.Impulse);
+            }
             Vector3 cancelYForce = new Vector3(0.0f, -rb.velocity.y, 0.0f);
             rb.AddForce(cancelYForce, ForceMode.Impulse);
             rb.AddForce(movement * jumpMultiplier, ForceMode.Impulse);
@@ -149,23 +165,17 @@ public class PlayerController : MonoBehaviour
             SetCountText();
         }
     }
-    
-    
-    private void OnCollisionEnter(Collision other)
-    {
-        if (other.gameObject.CompareTag("Ground") && touchingGround == false)
-        {
-            touchingGround = true;
-            jumpCharges = maxJumps;
-        }
-    }
 
-    private void OnCollisionExit(Collision other)
+    private void OnCollisionEnter(Collision collision)
     {
-        if (other.gameObject.CompareTag("Ground") && touchingGround == true)
+        if (Vector3.Dot(collision.contacts[0].normal, Vector3.up) != 1)
         {
-            touchingGround = false;
+            onAngledGrnd = true;
+            tempNormal = collision.contacts[0].normal;
+        }
+        else if(Vector3.Dot(collision.contacts[0].normal, Vector3.up) == 1)
+        {
+            onAngledGrnd = false;
         }
     }
-    
 }
