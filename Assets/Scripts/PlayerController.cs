@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     public float jumpMultiplier = 2f;
     public int maxJumps = 1;
     public bool paused;
+    public GameObject GrndDetector;
 
     private Rigidbody rb;
     private int count;
@@ -22,8 +23,8 @@ public class PlayerController : MonoBehaviour
     private Vector3 start;
     private float movementZ;
     private int numPickUps;
-    private int jumpCharges;
-    private bool touchingGround;
+    public int jumpCharges;
+    public bool touchingGround;
     private bool canJump;
     private bool visible;
 
@@ -117,6 +118,8 @@ public class PlayerController : MonoBehaviour
             rb.AddForce(cancelYForce, ForceMode.Impulse);
             rb.AddForce(movement * jumpMultiplier, ForceMode.Impulse);
             jumpCharges--;
+            GrndDetector.GetComponent<ParticleSystem>().Clear();
+            GrndDetector.GetComponent<ParticleSystem>().Play();
         }
     }
 
@@ -125,7 +128,7 @@ public class PlayerController : MonoBehaviour
         float angle = cameraObj.transform.eulerAngles.y;
         float targetAngle = Mathf.Atan2(movementX, movementZ) * Mathf.Rad2Deg + angle;
         Vector3 moveDir = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
-        Debug.Log(rb.velocity);
+        
         if(movementX == 0.0f && movementZ == 0.0f)
         {
             rb.AddForce(Vector3.zero);
@@ -147,6 +150,7 @@ public class PlayerController : MonoBehaviour
         }
     }
     
+    
     private void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.CompareTag("Ground") && touchingGround == false)
@@ -163,4 +167,5 @@ public class PlayerController : MonoBehaviour
             touchingGround = false;
         }
     }
+    
 }
