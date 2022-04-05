@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
     public bool paused;
     public GameObject GrndDetector;
     public bool onAngledGrnd;
+    public GameObject infoLooseLeaf;
+    public GameObject winLooseLeaf;
 
     private Rigidbody rb;
     private int count;
@@ -39,6 +41,7 @@ public class PlayerController : MonoBehaviour
         numPickUps = GameObject.FindGameObjectsWithTag("PickUp").Length;
         SetCountText();
         winTextObject.SetActive(false);
+        winLooseLeaf.SetActive(false);
 
         touchingGround = false;
         canJump = true;
@@ -70,6 +73,7 @@ public class PlayerController : MonoBehaviour
         if(count >= numPickUps)
         {
             winTextObject.SetActive(true);
+            winLooseLeaf.SetActive(true);
         }
     }
 
@@ -99,16 +103,19 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.I) == true && paused == true && visible == false)
         {
             infoTextObject.SetActive(!infoTextObject.activeSelf);
+            infoLooseLeaf.SetActive(!infoLooseLeaf.activeSelf);
             visible = true;
         }
         else if (Input.GetKeyDown(KeyCode.I) == true && paused == true && visible == true)
         {
             infoTextObject.SetActive(!infoTextObject.activeSelf);
+            infoLooseLeaf.SetActive(!infoLooseLeaf.activeSelf);
             visible = false;
         }
         else if (paused == false)
         {
             infoTextObject.SetActive(false);
+            infoLooseLeaf.SetActive(false);
             visible = false;
         }
     }
