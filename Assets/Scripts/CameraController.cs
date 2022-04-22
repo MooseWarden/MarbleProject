@@ -6,72 +6,76 @@ using UnityEngine.InputSystem;
 public class CameraController : MonoBehaviour
 {
     public GameObject player;
-    //public int moveOffset = 1;
-    public int camSpeed = 1;
+    public GameObject pivot;
+    public float minX;
+    public float maxX;
+    public int camSpeed;
 
+    private Vector3 rotatorHoldX;
+    private Vector3 rotatorHoldY;
     private Vector3 distanceOffset;
-    //private Quaternion initRotate;
     private Vector3 rotateX;
-    //private Vector3 rotateY;
+    private Vector3 rotateY;
     private bool isPaused;
 
     // Start is called before the first frame update
     void Start()
     {
         distanceOffset = transform.position - player.transform.position;
-        //initRotate = transform.rotation;
-        rotateX = distanceOffset;
-        //rotateY = distanceOffset;
+        transform.position = player.transform.position + distanceOffset;
+        rotatorHoldX = Vector3.zero;
+        rotatorHoldY = Vector3.zero;
+        rotateX = Vector3.zero;
+        rotateY = Vector3.zero;
     }
 
     // Update is called once per frame
     void LateUpdate()
     {
-        transform.position = player.transform.position + distanceOffset;
-        transform.position = player.transform.position + rotateX;
-        //transform.position = player.transform.position + rotateY;
-
-        transform.LookAt(player.transform.position);
         isPaused = player.GetComponent<PlayerController>().paused;
 
-        if (Input.GetMouseButton(1) && isPaused != true)
-        {
-            /*
-            float moveX = Input.GetAxis("Mouse X");
-            transform.RotateAround(player.transform.position, Vector3.down, moveX * moveOffset);
+        pivot.transform.position = player.transform.position;
 
-            float moveY = Input.GetAxis("Mouse Y");
-            transform.RotateAround(player.transform.position, Vector3.right, moveY * moveOffset);
-            */
-
-            rotateX = Quaternion.AngleAxis(Input.GetAxis("Mouse X") * camSpeed, Vector3.up) * rotateX;
-            transform.position = player.transform.position + rotateX;
-            transform.LookAt(player.transform.position);
-            //Debug.Log(isPaused);
-        }
-        
-        /*
-        if (Input.GetAxis("Mouse ScrollWheel") > 0)
+        if (Input.GetAxis("Mouse ScrollWheel") > 0 && isPaused != true)
         {
-            rotateY = Quaternion.AngleAxis(Input.GetAxis("Mouse ScrollWheel") * camSpeed, Vector3.right) * rotateY;
-            transform.position = player.transform.position + rotateY;
-            transform.LookAt(player.transform.position);
+            rotateX = Quaternion.AngleAxis(Input.GetAxis("Mouse ScrollWheel"), Vector3.right) * Vector3.one;
+            rotatorHoldX.x -= (rotateX.x * camSpeed);
+            if (rotatorHoldX.x < minX)
+            {
+                rotatorHoldX.x = minX;
+            }
         }
 
-        if (Input.GetAxis("Mouse ScrollWheel") < 0)
+        if (Input.GetAxis("Mouse ScrollWheel") < 0 && isPaused != true)
         {
-            rotateY = Quaternion.AngleAxis(Input.GetAxis("Mouse ScrollWheel") * camSpeed, Vector3.left) * rotateY;
-            transform.position = player.transform.position - rotateY;
-            transform.LookAt(player.transform.position);
-            Debug.Log(Input.GetAxis("Mouse ScrollWheel"));
+            rotateX = Quaternion.AngleAxis(Input.GetAxis("Mouse ScrollWheel"), Vector3.right) * Vector3.one;
+            rotatorHoldX.x += (rotateX.x * camSpeed);
+            if (rotatorHoldX.x > maxX)
+            {
+                rotatorHoldX.x = maxX;
+            }
         }
-        */
 
-        /*
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(1) && Input.GetAxis("Mouse X") > 0 && isPaused != true)
         {
-            //transform.rotation = initRotate;            
+            rotateY = Quaternion.AngleAxis(Input.GetAxis("Mouse X"), Vector3.up) * Vector3.one;
+            rotatorHoldY.y += (rotateY.y * camSpeed);
         }
-        */
+
+        if (Input.GetMouseButton(1) && Input.GetAxis("Mouse X") < 0 && isPaused != true)
+        {
+            rotateY = Quaternion.AngleAxis(Input.GetAxis("Mouse X"), Vector3.up) * Vector3.one;
+            rotatorHoldY.y -= (rotateY.y * camSpeed);
+        }
+
+        if (Input.GetMouseButton(0) && isPaused != true)
+        {
+            rotatorHoldX = Vector3.zero;
+            rotatorHoldY = Vector3.zero;
+        }
+
+        pivot.transform.eulerAngles = new Vector3(rotatorHoldX.x, rotatorHoldY.y, 0);
+                        
+        transform.LookAt(player.transform.position);
     }
 }
