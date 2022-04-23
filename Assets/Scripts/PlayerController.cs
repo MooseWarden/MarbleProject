@@ -132,6 +132,7 @@ public class PlayerController : MonoBehaviour
             }
             else if(onAngledGrnd == true)
             {
+                //this is where the jump effect stuff will go
                 movement = tempNormal;
                 onAngledGrnd = false;
                 Vector3 cancelXZForce = new Vector3(-rb.velocity.x, 0.0f, -rb.velocity.z);
