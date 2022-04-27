@@ -14,10 +14,11 @@ public class PlayerController : MonoBehaviour
     public float jumpMultiplier = 2f;
     public int maxJumps = 1;
     public bool paused;
-    public GameObject GrndDetector;
+    public GameObject GrndPivot;
     public bool onAngledGrnd;
     public GameObject infoLooseLeaf;
     public GameObject winLooseLeaf;
+    public Animator jumpEffect;
 
     private Rigidbody rb;
     private int count;
@@ -79,6 +80,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        GrndPivot.transform.position = transform.position;
+
         if (Keyboard.current.spaceKey.wasPressedThisFrame == true)
         {
             Jump();
@@ -128,22 +131,26 @@ public class PlayerController : MonoBehaviour
 
             if(onAngledGrnd == false)
             {
+                GrndPivot.transform.eulerAngles = Vector3.zero;
+
                 movement = new Vector3(0.0f, movementY, 0.0f); //x is left to right, y is up and down, z is forwad and back
             }
             else if(onAngledGrnd == true)
             {
-                //this is where the jump effect stuff will go
                 movement = tempNormal;
                 onAngledGrnd = false;
                 Vector3 cancelXZForce = new Vector3(-rb.velocity.x, 0.0f, -rb.velocity.z);
                 rb.AddForce(cancelXZForce, ForceMode.Impulse);
             }
+            
             Vector3 cancelYForce = new Vector3(0.0f, -rb.velocity.y, 0.0f);
+            
             rb.AddForce(cancelYForce, ForceMode.Impulse);
             rb.AddForce(movement * jumpMultiplier, ForceMode.Impulse);
+            
             jumpCharges--;
-            GrndDetector.GetComponent<ParticleSystem>().Clear();
-            GrndDetector.GetComponent<ParticleSystem>().Play();
+            
+            jumpEffect.SetTrigger("Jump");
         }
     }
 
@@ -176,14 +183,35 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        /*
+         * this version isnt always accurate and doesnt always return the correct angles upon collision
         if (Vector3.Dot(collision.contacts[0].normal, Vector3.up) != 1)
         {
             onAngledGrnd = true;
             tempNormal = collision.contacts[0].normal;
+            GrndPivot.transform.eulerAngles = collision.gameObject.transform.eulerAngles;
         }
         else if(Vector3.Dot(collision.contacts[0].normal, Vector3.up) == 1)
         {
             onAngledGrnd = false;
         }
+        */
+
+        //this version looks at the angle of the objects being collided against
+        if (collision.gameObject.CompareTag("Ground") && collision.gameObject.transform.eulerAngles != Vector3.zero)
+        {
+            onAngledGrnd = true;
+            tempNormal = collision.contacts[0].normal;
+            GrndPivot.transform.eulerAngles = collision.gameObject.transform.eulerAngles;
+        }
+        else if(collision.gameObject.CompareTag("Ground") && collision.gameObject.transform.eulerAngles == Vector3.zero)
+        {
+            onAngledGrnd = false;
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        onAngledGrnd = false;
     }
 }

@@ -6,16 +6,17 @@ public class GrndDetectorController : MonoBehaviour
 {
     public GameObject playerObj;
 
-    private Quaternion InitRot;
-    private Vector3 distanceOffset;
+    //unneeded now that its a child of another object
+    //private Quaternion InitRot;
+    //private Vector3 distanceOffset;
     private PlayerController playerScript;
 
     // Start is called before the first frame update
     void Start()
     {
-        distanceOffset = transform.position - playerObj.transform.position;
+        //distanceOffset = transform.position - playerObj.transform.position;
 
-        InitRot = transform.rotation;
+        //InitRot = transform.rotation;
 
         playerScript = playerObj.GetComponent<PlayerController>();
     }
@@ -28,9 +29,9 @@ public class GrndDetectorController : MonoBehaviour
 
     private void LateUpdate()
     {
-        transform.position = playerObj.transform.position + distanceOffset;
+        //transform.position = playerObj.transform.position + distanceOffset;
 
-        transform.rotation = InitRot;
+        //transform.rotation = InitRot;
     }
     
     private void OnTriggerEnter(Collider other)
