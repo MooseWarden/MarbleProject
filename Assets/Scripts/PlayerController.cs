@@ -62,7 +62,7 @@ public class PlayerController : MonoBehaviour
     void OnMove(InputValue movementValue)
     {
         Vector3 movementVector = movementValue.Get<Vector3>();
-        
+
         movementX = movementVector.x;
         movementY = movementVector.y;
         movementZ = movementVector.z;
@@ -71,7 +71,7 @@ public class PlayerController : MonoBehaviour
     void SetCountText()
     {
         countText.text = "Count: " + count.ToString() + "/" + numPickUps.ToString();
-        if(count >= numPickUps)
+        if (count >= numPickUps)
         {
             winTextObject.SetActive(true);
             winLooseLeaf.SetActive(true);
@@ -87,7 +87,7 @@ public class PlayerController : MonoBehaviour
             Jump();
         }
 
-        if(Input.GetKeyDown(KeyCode.R) == true && paused == false)
+        if (Input.GetKeyDown(KeyCode.R) == true && paused == false)
         {
             transform.position = start;
         }
@@ -115,6 +115,10 @@ public class PlayerController : MonoBehaviour
             infoLooseLeaf.SetActive(!infoLooseLeaf.activeSelf);
             visible = false;
         }
+        else if ((Input.GetKeyDown(KeyCode.LeftShift) == true || Input.GetKeyDown(KeyCode.RightShift) == true) && GetComponent<Dash>().isCooldown == false)
+        {
+            StartCoroutine(GetComponent<Dash>().DashCoroutine());  //Start();
+        }
         else if (paused == false)
         {
             infoTextObject.SetActive(false);
@@ -129,27 +133,27 @@ public class PlayerController : MonoBehaviour
         {
             Vector3 movement = Vector3.zero;
 
-            if(onAngledGrnd == false)
+            if (onAngledGrnd == false)
             {
                 GrndPivot.transform.eulerAngles = Vector3.zero;
 
                 movement = new Vector3(0.0f, movementY, 0.0f); //x is left to right, y is up and down, z is forwad and back
             }
-            else if(onAngledGrnd == true)
+            else if (onAngledGrnd == true)
             {
                 movement = tempNormal;
                 onAngledGrnd = false;
                 Vector3 cancelXZForce = new Vector3(-rb.velocity.x, 0.0f, -rb.velocity.z);
                 rb.AddForce(cancelXZForce, ForceMode.Impulse);
             }
-            
+
             Vector3 cancelYForce = new Vector3(0.0f, -rb.velocity.y, 0.0f);
-            
+
             rb.AddForce(cancelYForce, ForceMode.Impulse);
             rb.AddForce(movement * jumpMultiplier, ForceMode.Impulse);
-            
+
             jumpCharges--;
-            
+
             jumpEffect.SetTrigger("Jump");
         }
     }
@@ -159,8 +163,8 @@ public class PlayerController : MonoBehaviour
         float angle = cameraObj.transform.eulerAngles.y;
         float targetAngle = Mathf.Atan2(movementX, movementZ) * Mathf.Rad2Deg + angle;
         Vector3 moveDir = Quaternion.Euler(0.0f, targetAngle, 0.0f) * Vector3.forward;
-        
-        if(movementX == 0.0f && movementZ == 0.0f)
+
+        if (movementX == 0.0f && movementZ == 0.0f)
         {
             rb.AddForce(Vector3.zero);
         }
@@ -204,7 +208,7 @@ public class PlayerController : MonoBehaviour
             tempNormal = collision.contacts[0].normal;
             GrndPivot.transform.eulerAngles = collision.gameObject.transform.eulerAngles;
         }
-        else if(collision.gameObject.CompareTag("Ground") && collision.gameObject.transform.eulerAngles == Vector3.zero)
+        else if (collision.gameObject.CompareTag("Ground") && collision.gameObject.transform.eulerAngles == Vector3.zero)
         {
             onAngledGrnd = false;
         }
